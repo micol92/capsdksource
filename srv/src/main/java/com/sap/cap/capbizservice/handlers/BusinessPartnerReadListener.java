@@ -55,7 +55,7 @@ import com.sap.cloud.sdk.s4hana.datamodel.odata.services.DefaultBusinessPartnerS
 @ServiceName("cloud.sdk.capng")
 public class BusinessPartnerReadListener implements EventHandler {
 
-    private final HttpDestination httpDestination = DestinationAccessor.getDestination("MyABAPSystem").asHttp();
+    private final HttpDestination httpDestination = DestinationAccessor.getDestination("MYERPS20").asHttp();
 
     @On(event = CdsService.EVENT_READ, entity = "cloud.sdk.capng.CapBusinessPartner")
     public void onRead(CdsReadEventContext context) throws ODataException {
@@ -65,7 +65,7 @@ public class BusinessPartnerReadListener implements EventHandler {
                 new DefaultBusinessPartnerService().getAllBusinessPartner().top(10).execute(httpDestination);
 
         final List<CapBusinessPartner> capBusinessPartners =
-                convertS4BusinessPartnersToCapBusinessPartners(businessPartners, "MyABAPSystem");
+                convertS4BusinessPartnersToCapBusinessPartners(businessPartners, "MYERPS20");
         capBusinessPartners.forEach(capBusinessPartner -> {
             result.put(capBusinessPartner.getId(), capBusinessPartner);
         });
@@ -78,7 +78,16 @@ public class BusinessPartnerReadListener implements EventHandler {
         final BusinessPartnerService service = new DefaultBusinessPartnerService();
 
         Map<String, Object> m = context.getCqn().entries().get(0);
-        BusinessPartner bp = BusinessPartner.builder().firstName(m.get("firstName").toString()).lastName(m.get("surname").toString()).businessPartner(m.get("ID").toString()).build();
+        //BusinessPartner bp = BusinessPartner.builder().firstName(m.get("firstName").toString()).lastName(m.get("surname").toString()).businessPartner(m.get("ID").toString()).build();
+        BusinessPartner bp = BusinessPartner.builder().
+            firstName(m.get("firstName").toString()).
+            lastName(m.get("surname").toString()).
+            businessPartner(m.get("ID").toString()).
+            businessPartnerCategory("2".toString()).
+            businessPartnerName("ecbank".toString()).
+            groupBusinessPartnerName1("sap-p1".toString()).
+            organizationBPName1("sap-org1".toString()).
+            build();
 
         service.createBusinessPartner(bp).execute(httpDestination);
     }
